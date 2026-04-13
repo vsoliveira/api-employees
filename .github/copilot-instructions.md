@@ -8,7 +8,7 @@
 - Use SOLID principles
 - Use `domain`, `application`, `infrastructure` directory structure
 - Follow Google Java Style Guide
-- Persistency: JPA + PostgresSQL with Flybase (migrations control)
+- Persistency: JPA + PostgresSQL with Flyway (migrations control)
 - Testing: JUnit 5 + Mockito for unit tests. Also integration and stress tests (Grafana k6)
 - Build: Gradle (Java 25 compatibility)
 - Architecture: Spring Boot patterns, Spring Boot Admin, constructor injection
