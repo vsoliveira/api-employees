@@ -46,10 +46,6 @@ gradle-app.setting
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
 
-# Docker environment variables
-docker/**/.env*
-!docker/**/.env.example
-
 # Docker volumes and data
 postgres_data*/
 grafana_data*/

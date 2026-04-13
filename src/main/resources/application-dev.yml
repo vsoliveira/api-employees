@@ -1,0 +1,63 @@
+# Development Profile - PostgreSQL via Docker Compose
+spring:
+  application:
+    name: employees-api
+  datasource:
+    url: jdbc:postgresql://postgres:5432/employees_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  flyway:
+    locations: classpath:db/migration
+    baselineOnMigrate: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+api:
+  key: dev-api-key
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+  tracing:
+    jaeger:
+      grpc:
+        endpoint: http://jaeger:14250
+      enabled: true
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+logging:
+  level:
+    root: INFO
+    com.company: DEBUG
+    org.hibernate.SQL: DEBUG
