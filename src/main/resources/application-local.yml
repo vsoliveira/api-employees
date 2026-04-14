@@ -1,0 +1,54 @@
+# Local Development Profile - PostgreSQL on localhost (no Docker)
+spring:
+  application:
+    name: employees-api
+  datasource:
+    url: jdbc:postgresql://localhost:5432/employees_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  flyway:
+    locations: classpath:db/migration
+    baselineOnMigrate: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+api:
+  key: local-dev-key
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+springdoc:
+  api-docs:
+    path: /v1/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+logging:
+  level:
+    root: INFO
+    com.company: DEBUG
