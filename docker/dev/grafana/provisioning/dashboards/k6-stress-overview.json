@@ -23,7 +23,7 @@
   "panels": [
     {
       "gridPos": {
-        "h": 3,
+        "h": 4,
         "w": 24,
         "x": 0,
         "y": 0
@@ -35,12 +35,138 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "# Employees API monitoring\nFocus: `/api/v1/employees` traffic. Micrometer stores the endpoint label as `/v1/employees` because the `/api` context path is stripped before metrics tagging.\n\nThis dashboard is ready for stress testing with throughput, latency, saturation, JVM, and connection-pool panels. True percentiles such as p95 and p99 will require HTTP histogram buckets to be enabled later.",
+        "content": "# k6 stress overview\nThis dashboard expects k6 metrics sent to Prometheus remote write.\n\nRecommended run shape:\n\n```bash\nK6_PROMETHEUS_RW_SERVER_URL=http://localhost:9090/api/v1/write \\\nK6_PROMETHEUS_RW_TREND_STATS=p(95),p(99),avg,max \\\nK6_PROMETHEUS_RW_STALE_MARKERS=true \\\nk6 run -o experimental-prometheus-rw --tag testid=<unique-run-id> script.js\n```\n\nUse `testid` to isolate one run from another. `scenario` becomes useful when the k6 script defines multiple scenarios.",
         "mode": "markdown"
       },
       "pluginVersion": "12.4.2",
-      "title": "Usage Notes",
+      "title": "Run Notes",
       "type": "text"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 0,
+        "y": 4
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(k6_vus{testid=~\"$testid\",scenario=~\"$scenario\"})",
+          "legendFormat": "vus",
+          "refId": "A"
+        }
+      ],
+      "title": "Active VUs",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 4,
+        "x": 4,
+        "y": 4
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "max(k6_vus_max{testid=~\"$testid\",scenario=~\"$scenario\"})",
+          "legendFormat": "vus max",
+          "refId": "A"
+        }
+      ],
+      "title": "Max VUs",
+      "type": "stat"
     },
     {
       "datasource": {
@@ -68,11 +194,11 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 0,
-        "y": 3
+        "w": 4,
+        "x": 8,
+        "y": 4
       },
-      "id": 2,
+      "id": 4,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -97,12 +223,12 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(rate(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[1m]))",
-          "legendFormat": "req/s",
+          "expr": "sum(rate(k6_http_reqs_total{testid=~\"$testid\",scenario=~\"$scenario\"}[1m]))",
+          "legendFormat": "http req/s",
           "refId": "A"
         }
       ],
-      "title": "Request Rate",
+      "title": "HTTP Throughput",
       "type": "stat"
     },
     {
@@ -122,28 +248,20 @@
               {
                 "color": "green",
                 "value": null
-              },
-              {
-                "color": "yellow",
-                "value": 250
-              },
-              {
-                "color": "red",
-                "value": 750
               }
             ]
           },
-          "unit": "ms"
+          "unit": "ops"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 6,
-        "y": 3
+        "w": 4,
+        "x": 12,
+        "y": 4
       },
-      "id": 3,
+      "id": 5,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -168,12 +286,12 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "1000 * sum(rate(http_server_requests_seconds_sum{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[1m])) / clamp_min(sum(rate(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[1m])), 0.001)",
-          "legendFormat": "avg latency",
+          "expr": "sum(rate(k6_iterations_total{testid=~\"$testid\",scenario=~\"$scenario\"}[1m]))",
+          "legendFormat": "iter/s",
           "refId": "A"
         }
       ],
-      "title": "Average Latency",
+      "title": "Iteration Rate",
       "type": "stat"
     },
     {
@@ -210,11 +328,11 @@
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 12,
-        "y": 3
+        "w": 4,
+        "x": 16,
+        "y": 4
       },
-      "id": 4,
+      "id": 6,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -239,12 +357,12 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "100 * sum(rate(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\",status=~\"4..|5..\"}[1m])) / clamp_min(sum(rate(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[1m])), 0.001)",
-          "legendFormat": "error rate",
+          "expr": "100 * avg(k6_http_req_failed_rate{testid=~\"$testid\",scenario=~\"$scenario\"})",
+          "legendFormat": "fail rate",
           "refId": "A"
         }
       ],
-      "title": "Error Rate",
+      "title": "Failure Rate",
       "type": "stat"
     },
     {
@@ -267,17 +385,17 @@
               }
             ]
           },
-          "unit": "none"
+          "unit": "ms"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 4,
-        "w": 6,
-        "x": 18,
-        "y": 3
+        "w": 4,
+        "x": 20,
+        "y": 4
       },
-      "id": 5,
+      "id": 7,
       "options": {
         "colorMode": "value",
         "graphMode": "area",
@@ -302,12 +420,12 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum(increase(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[$__range]))",
-          "legendFormat": "requests",
+          "expr": "k6_http_req_duration_p95{testid=~\"$testid\",scenario=~\"$scenario\"}",
+          "legendFormat": "p95",
           "refId": "A"
         }
       ],
-      "title": "Requests In Range",
+      "title": "HTTP p95",
       "type": "stat"
     },
     {
@@ -367,9 +485,9 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 7
+        "y": 8
       },
-      "id": 6,
+      "id": 8,
       "options": {
         "legend": {
           "calcs": [],
@@ -390,12 +508,215 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "sum by (method, status) (rate(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[1m]))",
-          "legendFormat": "{{method}} {{status}}",
+          "expr": "sum by (scenario) (rate(k6_http_reqs_total{testid=~\"$testid\",scenario=~\"$scenario\"}[1m]))",
+          "legendFormat": "{{scenario}}",
           "refId": "A"
         }
       ],
-      "title": "Request Throughput by Method and Status",
+      "title": "HTTP Throughput by Scenario",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ops"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 8
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum by (scenario) (rate(k6_iterations_total{testid=~\"$testid\",scenario=~\"$scenario\"}[1m]))",
+          "legendFormat": "{{scenario}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Iteration Rate by Scenario",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 16
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "k6_http_req_duration_avg{testid=~\"$testid\",scenario=~\"$scenario\"}",
+          "legendFormat": "avg",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "k6_http_req_duration_p95{testid=~\"$testid\",scenario=~\"$scenario\"}",
+          "legendFormat": "p95",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "k6_http_req_duration_p99{testid=~\"$testid\",scenario=~\"$scenario\"}",
+          "legendFormat": "p99",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "k6_http_req_duration_max{testid=~\"$testid\",scenario=~\"$scenario\"}",
+          "legendFormat": "max",
+          "refId": "D"
+        }
+      ],
+      "title": "HTTP Duration Trend",
       "type": "timeseries"
     },
     {
@@ -455,9 +776,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 7
+        "y": 16
       },
-      "id": 7,
+      "id": 11,
       "options": {
         "legend": {
           "calcs": [],
@@ -478,8 +799,8 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "1000 * sum(rate(http_server_requests_seconds_sum{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[1m])) / clamp_min(sum(rate(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[1m])), 0.001)",
-          "legendFormat": "avg",
+          "expr": "k6_iteration_duration_avg{testid=~\"$testid\",scenario=~\"$scenario\"}",
+          "legendFormat": "iter avg",
           "refId": "A"
         },
         {
@@ -487,30 +808,109 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "1000 * histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[5m])) by (le))",
-          "legendFormat": "p95",
+          "expr": "k6_iteration_duration_p95{testid=~\"$testid\",scenario=~\"$scenario\"}",
+          "legendFormat": "iter p95",
           "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "1000 * histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[5m])) by (le))",
-          "legendFormat": "p99",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "1000 * max_over_time(http_server_requests_seconds_max{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[5m])",
-          "legendFormat": "max observed",
-          "refId": "D"
         }
       ],
-      "title": "Latency Trend",
+      "title": "Iteration Duration Trend",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${datasource}"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisPlacement": "auto",
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 4,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "binBps"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 24
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "hideZeros": false,
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.4.2",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(k6_data_received_bytes_total{testid=~\"$testid\",scenario=~\"$scenario\"}[1m]))",
+          "legendFormat": "received",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${datasource}"
+          },
+          "expr": "sum(rate(k6_data_sent_bytes_total{testid=~\"$testid\",scenario=~\"$scenario\"}[1m]))",
+          "legendFormat": "sent",
+          "refId": "B"
+        }
+      ],
+      "title": "Network Throughput",
       "type": "timeseries"
     },
     {
@@ -563,677 +963,7 @@
               }
             ]
           },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 15
-      },
-      "id": 8,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by (status) (increase(http_server_requests_seconds_count{job=~\"$job\",instance=~\"$instance\",uri=~\"$uri\"}[$__range]))",
-          "legendFormat": "{{status}}",
-          "refId": "A"
-        }
-      ],
-      "title": "Requests by Status in Selected Range",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "percentunit"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 15
-      },
-      "id": 9,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "process_cpu_usage{job=~\"$job\",instance=~\"$instance\"}",
-          "legendFormat": "process CPU",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "system_cpu_usage{job=~\"$job\",instance=~\"$instance\"}",
-          "legendFormat": "system CPU",
-          "refId": "B"
-        }
-      ],
-      "title": "CPU Usage",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "bytes"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 15
-      },
-      "id": 10,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "sum by (area) (jvm_memory_used_bytes{job=~\"$job\",instance=~\"$instance\",area=~\"heap|nonheap\"})",
-          "legendFormat": "{{area}}",
-          "refId": "A"
-        }
-      ],
-      "title": "JVM Memory Used",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 0,
-        "y": 23
-      },
-      "id": 11,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "jvm_threads_live_threads{job=~\"$job\",instance=~\"$instance\"}",
-          "legendFormat": "live threads",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "executor_active_threads{job=~\"$job\",instance=~\"$instance\",name1=~\".*\"}",
-          "legendFormat": "{{name1}} active",
-          "refId": "B"
-        }
-      ],
-      "title": "JVM and Executor Threads",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "percent"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 8,
-        "y": 23
-      },
-      "id": 12,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "100 * hikaricp_connections_active{job=~\"$job\",instance=~\"$instance\",pool=~\"$pool\"} / clamp_min(hikaricp_connections_max{job=~\"$job\",instance=~\"$instance\",pool=~\"$pool\"}, 1)",
-          "legendFormat": "{{pool}} active/max",
-          "refId": "A"
-        }
-      ],
-      "title": "DB Pool Utilization",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 8,
-        "x": 16,
-        "y": 23
-      },
-      "id": 13,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "hikaricp_connections_active{job=~\"$job\",instance=~\"$instance\",pool=~\"$pool\"}",
-          "legendFormat": "active",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "hikaricp_connections_idle{job=~\"$job\",instance=~\"$instance\",pool=~\"$pool\"}",
-          "legendFormat": "idle",
-          "refId": "B"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "hikaricp_connections_pending{job=~\"$job\",instance=~\"$instance\",pool=~\"$pool\"}",
-          "legendFormat": "pending",
-          "refId": "C"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "hikaricp_connections_max{job=~\"$job\",instance=~\"$instance\",pool=~\"$pool\"}",
-          "legendFormat": "max",
-          "refId": "D"
-        }
-      ],
-      "title": "DB Pool State",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "s"
-        },
-        "overrides": []
-      },
-      "gridPos": {
-        "h": 8,
-        "w": 12,
-        "x": 0,
-        "y": 31
-      },
-      "id": 14,
-      "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "table",
-          "placement": "bottom",
-          "showLegend": true
-        },
-        "tooltip": {
-          "hideZeros": false,
-          "mode": "multi",
-          "sort": "desc"
-        }
-      },
-      "pluginVersion": "12.4.2",
-      "targets": [
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "rate(jvm_gc_pause_seconds_sum{job=~\"$job\",instance=~\"$instance\"}[1m])",
-          "legendFormat": "GC pause seconds/s",
-          "refId": "A"
-        },
-        {
-          "datasource": {
-            "type": "prometheus",
-            "uid": "${datasource}"
-          },
-          "expr": "max_over_time(jvm_gc_pause_seconds_max{job=~\"$job\",instance=~\"$instance\"}[5m])",
-          "legendFormat": "max pause",
-          "refId": "B"
-        }
-      ],
-      "title": "GC Pause Pressure",
-      "type": "timeseries"
-    },
-    {
-      "datasource": {
-        "type": "prometheus",
-        "uid": "${datasource}"
-      },
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisPlacement": "auto",
-            "drawStyle": "line",
-            "fillOpacity": 12,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "lineInterpolation": "linear",
-            "lineWidth": 2,
-            "pointSize": 4,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "never",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              }
-            ]
-          },
-          "unit": "short"
+          "unit": "reqps"
         },
         "overrides": []
       },
@@ -1241,9 +971,9 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 31
+        "y": 24
       },
-      "id": 15,
+      "id": 13,
       "options": {
         "legend": {
           "calcs": [],
@@ -1264,12 +994,12 @@
             "type": "prometheus",
             "uid": "${datasource}"
           },
-          "expr": "system_load_average_1m{job=~\"$job\",instance=~\"$instance\"}",
-          "legendFormat": "1m load average",
+          "expr": "sum by (status) (rate(k6_http_reqs_total{testid=~\"$testid\",scenario=~\"$scenario\"}[1m]))",
+          "legendFormat": "{{status}}",
           "refId": "A"
         }
       ],
-      "title": "Host Load Average",
+      "title": "HTTP Throughput by Status",
       "type": "timeseries"
     }
   ],
@@ -1277,8 +1007,8 @@
   "refresh": "10s",
   "schemaVersion": 42,
   "tags": [
-    "employees-api",
-    "stress-test-ready"
+    "k6",
+    "stress-test"
   ],
   "templating": {
     "list": [
@@ -1299,28 +1029,29 @@
         "type": "datasource"
       },
       {
+        "allValue": ".*",
         "current": {
           "selected": true,
-          "text": "employees-api",
-          "value": "employees-api"
+          "text": "All",
+          "value": ".*"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(http_server_requests_seconds_count, job)",
+        "definition": "label_values(k6_http_reqs_total, testid)",
         "hide": 0,
-        "includeAll": false,
-        "label": "Job",
+        "includeAll": true,
+        "label": "Test ID",
         "multi": false,
-        "name": "job",
+        "name": "testid",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_requests_seconds_count, job)",
-          "refId": "Prometheus-job-Variable-Query"
+          "query": "label_values(k6_http_reqs_total, testid)",
+          "refId": "Prometheus-k6-TestId-Variable-Query"
         },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "type": "query"
       },
@@ -1335,63 +1066,19 @@
           "type": "prometheus",
           "uid": "${datasource}"
         },
-        "definition": "label_values(http_server_requests_seconds_count{job=~\"$job\"}, instance)",
+        "definition": "label_values(k6_http_reqs_total{testid=~\"$testid\"}, scenario)",
         "hide": 0,
         "includeAll": true,
-        "label": "Instance",
+        "label": "Scenario",
         "multi": true,
-        "name": "instance",
+        "name": "scenario",
         "options": [],
         "query": {
           "qryType": 1,
-          "query": "label_values(http_server_requests_seconds_count{job=~\"$job\"}, instance)",
-          "refId": "Prometheus-instance-Variable-Query"
+          "query": "label_values(k6_http_reqs_total{testid=~\"$testid\"}, scenario)",
+          "refId": "Prometheus-k6-Scenario-Variable-Query"
         },
-        "refresh": 1,
-        "regex": "",
-        "type": "query"
-      },
-      {
-        "current": {
-          "selected": true,
-          "text": "/v1/employees",
-          "value": "/v1/employees"
-        },
-        "hide": 0,
-        "includeAll": false,
-        "label": "URI",
-        "multi": false,
-        "name": "uri",
-        "options": [],
-        "query": "/v1/employees,/v1/employees/\\{id\\},/v1/employees.*",
-        "refresh": 1,
-        "regex": "",
-        "type": "custom"
-      },
-      {
-        "allValue": ".*",
-        "current": {
-          "selected": true,
-          "text": "All",
-          "value": ".*"
-        },
-        "datasource": {
-          "type": "prometheus",
-          "uid": "${datasource}"
-        },
-        "definition": "label_values(hikaricp_connections, pool)",
-        "hide": 0,
-        "includeAll": true,
-        "label": "DB Pool",
-        "multi": true,
-        "name": "pool",
-        "options": [],
-        "query": {
-          "qryType": 1,
-          "query": "label_values(hikaricp_connections, pool)",
-          "refId": "Prometheus-pool-Variable-Query"
-        },
-        "refresh": 1,
+        "refresh": 2,
         "regex": "",
         "type": "query"
       }
@@ -1403,8 +1090,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "Employees API - Metrics",
-  "uid": "employees-api",
-  "version": 2,
+  "title": "k6 Stress Overview",
+  "uid": "k6-stress-overview",
+  "version": 1,
   "weekStart": ""
 }
