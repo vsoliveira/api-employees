@@ -1,0 +1,218 @@
+:root {
+  --theme-color: #d97a2b;
+  --base-background: #f6f2ea;
+  --ink-strong: #11242e;
+  --ink-soft: #40535c;
+  --line-strong: rgba(17, 36, 46, 0.12);
+  --card-background: rgba(255, 255, 255, 0.86);
+  --card-shadow: 0 18px 45px rgba(17, 36, 46, 0.12);
+}
+
+body,
+.markdown-section,
+.sidebar,
+.content {
+  font-family: 'Space Grotesk', sans-serif;
+  background: var(--base-background);
+  color: var(--ink-strong);
+}
+
+.app-name,
+.sidebar-nav,
+.markdown-section h1,
+.markdown-section h2,
+.markdown-section h3,
+.cover h1 {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+code,
+pre,
+.token,
+.sidebar .search input,
+.markdown-section table code {
+  font-family: 'IBM Plex Mono', monospace;
+}
+
+.sidebar {
+  border-right: 1px solid var(--line-strong);
+  background:
+    radial-gradient(circle at top left, rgba(217, 122, 43, 0.15), transparent 32%),
+    linear-gradient(180deg, rgba(17, 36, 46, 0.04), rgba(17, 36, 46, 0));
+}
+
+.sidebar .search {
+  padding-top: 1rem;
+}
+
+.sidebar .search input {
+  border-radius: 999px;
+  border: 1px solid var(--line-strong);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.docsify-language-switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-left: auto;
+  padding: 0.2rem 0.2rem 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(17, 36, 46, 0.14);
+  background: rgba(255, 255, 255, 0.86);
+}
+
+.docsify-language-switcher__label {
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+
+.docsify-language-switcher__select {
+  border: 0;
+  background: transparent;
+  color: var(--ink-strong);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  padding: 0.2rem 0.5rem;
+}
+
+.docsify-language-switcher__select:focus {
+  outline: none;
+}
+
+.content {
+  background:
+    radial-gradient(circle at top right, rgba(42, 125, 117, 0.16), transparent 26%),
+    radial-gradient(circle at 20% 20%, rgba(217, 122, 43, 0.12), transparent 24%),
+    var(--base-background);
+}
+
+.markdown-section {
+  max-width: 980px;
+  padding-bottom: 4rem;
+}
+
+.markdown-section h1 {
+  font-size: 2.6rem;
+  letter-spacing: -0.03em;
+}
+
+.markdown-section h2 {
+  margin-top: 2.6rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.markdown-section p,
+.markdown-section li,
+.markdown-section td,
+.markdown-section th {
+  color: var(--ink-soft);
+}
+
+.markdown-section strong {
+  color: var(--ink-strong);
+}
+
+.markdown-section blockquote {
+  border-left: 4px solid var(--theme-color);
+  background: rgba(255, 255, 255, 0.68);
+  border-radius: 0 18px 18px 0;
+}
+
+.markdown-section pre,
+.markdown-section table {
+  background: var(--card-background);
+  border: 1px solid rgba(17, 36, 46, 0.08);
+  box-shadow: var(--card-shadow);
+  border-radius: 18px;
+}
+
+.markdown-section table {
+  overflow: hidden;
+}
+
+.markdown-section pre > code {
+  background: transparent;
+}
+
+.callout-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0 2rem;
+}
+
+.callout-card {
+  padding: 1.2rem;
+  border-radius: 20px;
+  border: 1px solid rgba(17, 36, 46, 0.08);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.74));
+  box-shadow: var(--card-shadow);
+}
+
+.callout-card p {
+  margin: 0.65rem 0 1rem;
+}
+
+.cover {
+  background:
+    radial-gradient(circle at 10% 15%, rgba(217, 122, 43, 0.45), transparent 26%),
+    radial-gradient(circle at 90% 10%, rgba(42, 125, 117, 0.4), transparent 28%),
+    linear-gradient(135deg, #11242e 10%, #183947 55%, #2a7d75 100%) !important;
+  color: #f9f4ec;
+}
+
+.cover .cover-main {
+  backdrop-filter: blur(3px);
+}
+
+.cover h1 {
+  color: #f9f4ec;
+  font-size: clamp(2.8rem, 6vw, 5.2rem);
+  letter-spacing: -0.04em;
+}
+
+.cover p {
+  color: rgba(249, 244, 236, 0.85);
+}
+
+.cover .cover-main img {
+  width: 124px;
+  margin-bottom: 1rem;
+}
+
+.cover .cover-main > p:last-child a {
+  border-radius: 999px;
+  border: 1px solid rgba(249, 244, 236, 0.36);
+  color: #f9f4ec;
+  background: rgba(249, 244, 236, 0.08);
+}
+
+.cover .cover-main > p:last-child a:last-child {
+  background: #d97a2b;
+  border-color: #d97a2b;
+}
+
+@media (max-width: 768px) {
+  .docsify-language-switcher {
+    width: 100%;
+    justify-content: space-between;
+    margin-left: 0;
+  }
+
+  .markdown-section {
+    padding-top: 1.5rem;
+  }
+
+  .markdown-section h1 {
+    font-size: 2.1rem;
+  }
+}

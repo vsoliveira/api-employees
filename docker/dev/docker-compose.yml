@@ -93,6 +93,21 @@ services:
       timeout: 5s
       retries: 3
 
+  docs:
+    build:
+      context: ../..
+      dockerfile: docs/Dockerfile
+    container_name: employees-docs-dev
+    ports:
+      - "${DOCS_PORT:-3200}:80"
+    networks:
+      - employees-network
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
 networks:
   employees-network:
     driver: bridge
