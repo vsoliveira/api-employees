@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality-gates:
+    name: Quality Gates
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: gradle
+
+      - name: Make scripts executable
+        run: chmod +x gradlew scripts/verify.sh scripts/check_diff_coverage.py
+
+      - name: Run build verification
+        run: ./scripts/verify.sh
+
+      - name: Enforce changed-line coverage
+        if: github.event_name == 'pull_request'
+        run: |
+          python3 scripts/check_diff_coverage.py \
+            --base-ref "origin/${{ github.base_ref }}" \
+            --jacoco-report build/reports/jacoco/test/jacocoTestReport.xml \
+            --threshold 98
+
+      - name: Upload verification reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: |
+            build/reports/jacoco/test
+            build/reports/pmd
+            build/reports/spotbugs
+            build/test-results/test
+          if-no-files-found: warn

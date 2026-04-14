@@ -1,5 +1,6 @@
 package com.company.employees.domain;
 
+import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,7 +32,12 @@ public class Employee {
      */
     public static Employee create(String name, String email, String department) {
         validate(name, email, department);
-        return new Employee(UUID.randomUUID(), name.trim(), email.trim().toLowerCase(), department.trim());
+        return new Employee(
+                UUID.randomUUID(),
+                name.trim(),
+                email.trim().toLowerCase(Locale.ROOT),
+                department.trim()
+        );
     }
 
     /**

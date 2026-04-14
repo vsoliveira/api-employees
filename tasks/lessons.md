@@ -42,6 +42,15 @@
   occurrences: 1
   status: active
 
+- date: 2026-04-14
+  error_type: build-tooling
+  trigger: "The new repository verification script failed before Gradle started with a permission denied error on ./gradlew"
+  root_cause: "The worktree did not guarantee an executable Gradle wrapper bit, but the verification entry point assumed it"
+  fix: "Updated scripts/verify.sh to set execute permission on the wrapper before invoking it"
+  rule: "When a repository standardizes on wrapper-based builds, make shared verification scripts robust to wrapper execute-bit drift"
+  occurrences: 1
+  status: active
+
 <!-- Use the YAML format below for each entry. Tags enable querying and pattern detection. -->
 
 <!--
@@ -59,7 +68,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total lessons logged | 4 |
+| Total lessons logged | 5 |
 | Patterns amended to skills | 0 |
 | Recurring patterns (3+) | 0 |
 | Sessions since last new lesson | 0 |
