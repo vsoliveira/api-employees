@@ -6,18 +6,13 @@ This document describes how to run the Employees API in different environments u
 
 ### Prerequisites
 - Docker and Docker Compose installed
-- Java 21+ (for building the application)
-- Gradle wrapper
+- Java 21+ (only for running the app outside Docker)
 
 ### Build the Application
 
-Before running any Docker environment, build the application:
+The Docker image now builds the application from source with a multi-stage Dockerfile. You no longer need to run `./gradlew bootJar` before starting a Compose environment.
 
-```bash
-./gradlew bootJar
-```
-
-This creates `build/libs/employees-api-*.jar` which is copied into the Docker image.
+Use `docker compose up --build` whenever you want Compose to rebuild the application image from the current source tree before starting the stack.
 
 ## Environment Profiles
 
@@ -60,13 +55,13 @@ Complete Docker-based development with full observability stack.
 
 ```bash
 cd docker/dev
-docker-compose --env-file .env.dev up -d
+docker compose --env-file .env.dev up --build -d
 ```
 
 Or using the included .env file:
 ```bash
 cd docker/dev
-docker-compose up -d
+docker compose up --build -d
 ```
 
 ### Services
@@ -84,7 +79,7 @@ docker-compose up -d
 Check that all services are healthy:
 
 ```bash
-docker-compose ps
+docker compose ps
 ```
 
 All containers should show `Up` status with `healthy` health check.
@@ -174,7 +169,7 @@ If the run does not appear immediately, wait a few seconds and refresh the dashb
 
 ```bash
 cd docker/dev
-docker-compose down -v
+docker compose down -v
 ```
 
 This removes all containers and volumes.
@@ -187,7 +182,7 @@ Production-like setup for pre-release testing.
 
 ```bash
 cd docker/stage
-docker-compose --env-file .env.stage up -d
+docker compose --env-file .env.stage up --build -d
 ```
 
 ### Configuration
@@ -201,7 +196,7 @@ Same stack as dev, but configured for staging conditions:
 
 ```bash
 cd docker/stage
-docker-compose down -v
+docker compose down -v
 ```
 
 ## Production Environment (Docker)
@@ -276,17 +271,17 @@ server {
 
 ```bash
 cd docker/prod
-docker-compose --env-file .env.prod.secret up -d
+docker compose --env-file .env.prod.secret up --build -d
 ```
 
 ### Monitor
 
 ```bash
 # Check service health
-docker-compose ps
+docker compose ps
 
 # View logs
-docker-compose logs -f app
+docker compose logs -f app
 
 # Access Prometheus
 # Via reverse proxy: https://yourdomain.com/monitoring/prometheus
@@ -299,7 +294,7 @@ docker-compose logs -f app
 
 ```bash
 cd docker/prod
-docker-compose down
+docker compose down
 ```
 
 Note: This does NOT remove volumes, so data persists.
@@ -356,13 +351,13 @@ See `src/test/resources/application.yml` for test configuration.
 
 Check logs:
 ```bash
-docker-compose logs app
+docker compose logs app
 ```
 
 Common issues:
-- PostgreSQL not yet healthy - wait a moment and check with `docker-compose ps`
+- PostgreSQL not yet healthy - wait a moment and check with `docker compose ps`
 - Port already in use - change `APP_PORT` in .env file
-- JAR not built - run `./gradlew bootJar`
+- Docker image is stale - rerun `docker compose up --build -d`
 
 ### Can't connect to API
 
@@ -372,22 +367,22 @@ curl http://localhost:8080/api/actuator/health
 ```
 
 If not accessible, check:
-1. Docker container is running: `docker-compose ps`
-2. Port mapping is correct: `docker-compose port app`
+1. Docker container is running: `docker compose ps`
+2. Port mapping is correct: `docker compose port app 8080`
 3. Network is properly created: `docker network ls`
 
 ### Database connection errors
 
 Check PostgreSQL is healthy:
 ```bash
-docker-compose logs postgres
-docker-compose exec postgres psql -U postgres -d employees_db -c "SELECT 1"
+docker compose logs postgres
+docker compose exec postgres psql -U postgres -d employees_db -c "SELECT 1"
 ```
 
 ### Metrics not appearing in Prometheus
 
 1. Verify API is exposing metrics: `curl http://localhost:8080/api/actuator/prometheus`
-2. Check Prometheus scrape config: `docker-compose exec prometheus cat /etc/prometheus/prometheus.yml`
+2. Check Prometheus scrape config: `docker compose exec prometheus cat /etc/prometheus/prometheus.yml`
 3. Wait 15+ seconds for first scrape to complete
 4. Check Prometheus targets: http://localhost:9090/targets
 
@@ -397,7 +392,7 @@ docker-compose exec postgres psql -U postgres -d employees_db -c "SELECT 1"
 
 Run multiple API instances:
 ```bash
-docker-compose up -d --scale app=3
+docker compose up -d --scale app=3
 ```
 
 Note: Requires load balancer in front for traffic distribution.
@@ -407,14 +402,14 @@ Note: Requires load balancer in front for traffic distribution.
 Override defaults:
 ```bash
 cd docker/dev
-DATABASE_USER=myuser DATABASE_PASSWORD=mypass docker-compose up -d
+DATABASE_USER=myuser DATABASE_PASSWORD=mypass docker compose up --build -d
 ```
 
 Or create a custom .env file:
 ```bash
 cp .env.dev .env.custom
 nano .env.custom
-docker-compose --env-file .env.custom up -d
+docker compose --env-file .env.custom up --build -d
 ```
 
 ### Persistent Configuration Backup

@@ -314,3 +314,20 @@ DELETE /api/v1/employees/{id}        Delete employee by UUID
 - [x] Prometheus exposes k6 metrics for the tagged run.
 - [x] Grafana can filter the run by `testid` on the k6 dashboard.
 
+## Task: Build app image inside Docker Compose workflow
+
+### Context
+- What: Move the application packaging step into the Docker image build used by Compose.
+- Why: Developers should be able to start the API and sidecar services with a single Compose command instead of running Gradle packaging first.
+- Risk: A source-based image build can become slow or brittle if the Docker context is too large or the Dockerfile still assumes a prebuilt JAR.
+
+### Steps
+- [x] Replace the runtime-only Dockerfile with a multi-stage build that creates the Spring Boot JAR from source.
+- [x] Add Docker ignore rules so Compose does not send local build artifacts back into the image build context.
+- [x] Update Docker documentation to use `docker compose up --build -d` as the single-command startup flow.
+
+### Verification
+- [x] `docker compose -f docker/dev/docker-compose.yml config` resolves successfully.
+- [x] `docker build -f Dockerfile .` can package the application from source without a prebuilt local JAR.
+- [x] Docker docs no longer require `./gradlew bootJar` before starting Compose.
+

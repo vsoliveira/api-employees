@@ -154,12 +154,9 @@ curl http://localhost:8080/api/actuator/health
 ### 2. Docker-Based Development
 
 ```bash
-# Build the application
-./gradlew bootJar
-
 # Start all services
 cd docker/dev
-docker-compose up -d
+docker compose up --build -d
 
 # Access services
 # API: http://localhost:8080/api
@@ -168,17 +165,17 @@ docker-compose up -d
 # Jaeger: http://localhost:16686
 
 # Stop services
-docker-compose down -v
+docker compose down -v
 ```
 
 ### 3. Staging Deployment
 
 ```bash
 cd docker/stage
-docker-compose --env-file .env.stage up -d
+docker compose --env-file .env.stage up --build -d
 
 # Monitor
-docker-compose logs -f app
+docker compose logs -f app
 ```
 
 ### 4. Production Deployment
@@ -192,7 +189,7 @@ export API_KEY="your-long-random-api-key"
 export GRAFANA_PASSWORD="your-grafana-password"
 
 # Deploy
-docker-compose --env-file .env.prod up -d
+docker compose --env-file .env.prod up --build -d
 
 # Behind reverse proxy (nginx/ALB)
 # Traffic: Internet → Reverse Proxy → Containers (internal)
@@ -277,8 +274,7 @@ curl http://localhost:8080/api/employees
 ### Verify Dev Profile
 ```bash
 cd docker/dev
-docker-compose up -d
-sleep 10  # Wait for services to start
+docker compose up --build -d
 curl http://localhost:8080/api/actuator/health
 open http://localhost:3000  # Grafana
 open http://localhost:16686  # Jaeger
@@ -313,13 +309,13 @@ curl http://localhost:8080/api/actuator/prometheus | head -20
 
 ### Container won't start
 ```bash
-docker-compose logs app
-# Common: JAR not built, port in use, database not ready
+docker compose logs app
+# Common: image not rebuilt, port in use, database not ready
 ```
 
 ### Can't connect to database
 ```bash
-docker-compose exec postgres psql -U postgres -d employees_db
+docker compose exec postgres psql -U postgres -d employees_db
 # Verify database exists and is listening
 ```
 
