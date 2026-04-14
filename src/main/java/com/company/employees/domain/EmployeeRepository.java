@@ -1,6 +1,5 @@
 package com.company.employees.domain;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -35,11 +34,12 @@ public interface EmployeeRepository {
     Optional<Employee> findByEmail(String email);
 
     /**
-     * Get all employees.
+     * Get a page of employees.
      *
-     * @return list of all employees
+        * @param query paginated and sorted employee query
+     * @return paginated employees
      */
-    List<Employee> findAll();
+        PageResult<Employee> findAll(EmployeePageQuery query);
 
     /**
      * Delete an employee by ID.

@@ -1,10 +1,11 @@
 package com.company.employees.application;
 
 import com.company.employees.domain.Employee;
+import com.company.employees.domain.EmployeePageQuery;
 import com.company.employees.domain.EmployeeRepository;
+import com.company.employees.domain.PageResult;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -19,11 +20,22 @@ public class ListEmployeesUseCase {
         this.employeeRepository = employeeRepository;
     }
 
-    public List<EmployeeResponse> execute() {
-        return employeeRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .collect(Collectors.toList());
+    public PagedResponse<EmployeeResponse> execute(ListEmployeesRequest request) {
+        EmployeePageQuery query = request.toQuery();
+
+        PageResult<Employee> employees = employeeRepository.findAll(query);
+        return new PagedResponse<>(
+                employees.getContent()
+                        .stream()
+                        .map(this::toResponse)
+                        .collect(Collectors.toList()),
+                employees.getPage(),
+                employees.getSize(),
+                employees.getTotalElements(),
+                employees.getTotalPages(),
+                request.getValidatedSortBy(),
+                request.getValidatedDirection()
+        );
     }
 
     private EmployeeResponse toResponse(Employee employee) {

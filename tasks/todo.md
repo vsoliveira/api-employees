@@ -110,3 +110,122 @@ DELETE /api/v1/employees/{id}        Delete employee by UUID
 - [x] Actuator endpoints used by sidecars do not return 401 without an API key.
 - [x] Employee business endpoints still require a valid API key.
 
+## Task: Paginate employee listing
+
+### Context
+- What: Replace the employee list use case and REST endpoint response with a paginated result.
+- Why: Returning the entire employee table does not scale and creates avoidable latency and payload size issues.
+- Risk: Breaking the current API contract or leaking Spring pagination types into the domain port.
+
+### Steps
+- [x] Introduce a domain-safe paginated repository result and update the list use case to request a page.
+- [x] Expose pagination parameters and metadata in the employee REST API while keeping defaults sensible.
+- [x] Add unit and integration coverage for pagination behavior and invalid request handling.
+
+### Verification
+- [x] Paginated list use case returns only the requested slice with correct metadata.
+- [x] GET /api/v1/employees supports page and size query parameters.
+- [x] Affected tests pass and the diff is reviewed.
+
+## Task: Document and sort paginated employee listing
+
+### Context
+- What: Add explicit OpenAPI documentation for the paginated employee response and allow clients to choose sort field and direction.
+- Why: The API contract should describe the paged payload accurately, and clients should not be forced into a fixed sort order.
+- Risk: Weak validation could allow unsupported sort properties or unstable ordering across pages.
+
+### Steps
+- [x] Introduce a validated sort model for employee listing and carry it through the use case and repository port.
+- [x] Expose sort query parameters on the REST endpoint with deterministic secondary ordering.
+- [x] Publish the concrete paginated employee response schema in OpenAPI and cover the behavior with tests.
+
+### Verification
+- [x] GET /api/v1/employees sorts by the requested field and direction.
+- [x] Invalid sort parameters are rejected with 400.
+- [x] OpenAPI documents the paginated employee response and list query parameters.
+
+## Task: Harden page size and align docs tests
+
+### Context
+- What: Enforce a maximum employee page size and make the test Springdoc path match the main application configuration.
+- Why: Page-size limits protect the endpoint from oversized requests, and consistent docs paths reduce false negatives in integration tests.
+- Risk: Tightening validation or test-time configuration can break existing endpoint assertions if not updated together.
+
+### Steps
+- [x] Enforce a maximum page size in the employee list use case and document it on the REST endpoint.
+- [x] Align the test profile Springdoc path with the main application and update docs/auth integration tests accordingly.
+- [x] Add regression coverage for oversized page requests and the aligned docs endpoint.
+
+### Verification
+- [x] Oversized employee page requests are rejected with 400.
+- [x] OpenAPI is served from the configured test path and still bypasses API-key enforcement.
+- [x] Targeted tests pass.
+
+## Task: Centralize employee list query validation
+
+### Context
+- What: Move employee list pagination and sorting defaults and validation into a dedicated request object.
+- Why: The list contract is currently split between controller parameters and use-case internals, which makes constraints harder to maintain consistently.
+- Risk: Spring query binding or OpenAPI parameter generation could drift during the refactor if the request object is not wired correctly.
+
+### Steps
+- [x] Introduce a list request object that owns defaults, validation, and conversion to the domain page query.
+- [x] Refactor the controller and use case to consume the request object instead of raw pagination and sort parameters.
+- [x] Add regression coverage for request-object defaults and validation through unit and integration tests.
+
+### Verification
+- [x] The use case accepts the centralized list request and preserves current pagination and sorting behavior.
+- [x] GET /v1/employees still binds and documents page, size, sortBy, and direction correctly.
+- [x] Affected tests pass.
+
+## Task: Standardize employee use-case request objects
+
+### Context
+- What: Make delete follow the same application-request pattern as create and list, and remove primitive overloads from the list use case.
+- Why: Application use cases should expose a consistent request-object boundary instead of a mix of transport primitives and request DTOs.
+- Risk: Refactoring use-case signatures can break tests or controller wiring if every caller is not updated together.
+
+### Steps
+- [x] Introduce a delete request object and refactor the delete use case and controller to consume it.
+- [x] Remove the primitive list use-case overloads so request objects are the only application entry point for listing.
+- [x] Update unit and integration coverage to exercise the request-based flow consistently.
+
+### Verification
+- [x] Delete and list use cases are invoked through request objects only.
+- [x] Employee REST endpoints preserve existing behavior after the signature refactor.
+- [x] Affected tests pass.
+
+## Task: Add bean validation and shared test support
+
+### Context
+- What: Add bean validation annotations to the application request DTOs and replace duplicated fake repositories in application tests with one shared in-memory implementation.
+- Why: Request validation should fail at the HTTP boundary where possible, and test support should not duplicate the same repository behavior across suites.
+- Risk: Validation error ordering can make tests brittle, and a shared test repository can affect multiple suites if it diverges from expected behavior.
+
+### Steps
+- [x] Add bean validation support and annotate employee request DTOs with constraints aligned to domain rules.
+- [x] Update the REST controller to trigger validation and return consistent 400 error payloads.
+- [x] Extract a shared in-memory employee repository for application tests and update the affected suites.
+
+### Verification
+- [x] Invalid employee create and list requests return 400 before reaching use-case logic.
+- [x] Application tests use the shared in-memory repository instead of per-file fake implementations.
+- [x] Targeted tests pass.
+
+## Task: Unify validation rules and isolate validation tests
+
+### Context
+- What: Share employee validation constants between the domain and request DTOs, and move validation-focused HTTP checks into their own integration suite.
+- Why: Validation messages should not drift across layers, and controller tests are easier to maintain when validation contracts are isolated from auth, pagination, and docs checks.
+- Risk: Over-refactoring could change existing error messages or fragment exception handling if the shared constants and test split are not done consistently.
+
+### Steps
+- [x] Extract shared employee validation constants and reuse them in the domain model and request DTO annotations.
+- [x] Move validation-specific HTTP assertions into a dedicated controller validation integration test suite.
+- [x] Verify whether custom application exception classes add value beyond the current domain and framework exception handling.
+
+### Verification
+- [x] Domain and DTO validation messages for employee fields come from one shared source.
+- [x] Validation-specific controller tests pass independently from the broader controller suite.
+- [x] The exception-layer decision is documented in the final assessment.
+

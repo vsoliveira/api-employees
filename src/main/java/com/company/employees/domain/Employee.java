@@ -2,21 +2,12 @@ package com.company.employees.domain;
 
 import java.util.Objects;
 import java.util.UUID;
-import java.util.regex.Pattern;
 
 /**
  * Employee Aggregate Root.
  * Encapsulates all business logic for employee creation and validation.
  */
 public class Employee {
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[A-Za-z0-9+_.-]+@(.+)$"
-    );
-    private static final int MIN_NAME_LENGTH = 2;
-    private static final int MAX_NAME_LENGTH = 100;
-    private static final int MAX_EMAIL_LENGTH = 255;
-    private static final int MAX_DEPARTMENT_LENGTH = 50;
-
     private final UUID id;
     private final String name;
     private final String email;
@@ -57,26 +48,24 @@ public class Employee {
      */
     private static void validate(String name, String email, String department) {
         if (name == null || name.trim().isEmpty()) {
-            throw new InvalidEmployeeException("Employee name cannot be empty");
+            throw new InvalidEmployeeException(EmployeeValidationRules.NAME_REQUIRED_MESSAGE);
         }
-        if (name.trim().length() < MIN_NAME_LENGTH || name.trim().length() > MAX_NAME_LENGTH) {
-            throw new InvalidEmployeeException(
-                    "Employee name must be between " + MIN_NAME_LENGTH + " and " + MAX_NAME_LENGTH + " characters"
-            );
+        if (name.trim().length() < EmployeeValidationRules.MIN_NAME_LENGTH
+                || name.trim().length() > EmployeeValidationRules.MAX_NAME_LENGTH) {
+            throw new InvalidEmployeeException(EmployeeValidationRules.NAME_LENGTH_MESSAGE);
         }
         if (email == null || email.trim().isEmpty()) {
-            throw new InvalidEmployeeException("Employee email cannot be empty");
+            throw new InvalidEmployeeException(EmployeeValidationRules.EMAIL_REQUIRED_MESSAGE);
         }
-        if (email.trim().length() > MAX_EMAIL_LENGTH || !EMAIL_PATTERN.matcher(email.trim()).matches()) {
-            throw new InvalidEmployeeException("Employee email format is invalid");
+        if (email.trim().length() > EmployeeValidationRules.MAX_EMAIL_LENGTH
+                || !EmployeeValidationRules.COMPILED_EMAIL_PATTERN.matcher(email.trim()).matches()) {
+            throw new InvalidEmployeeException(EmployeeValidationRules.EMAIL_FORMAT_MESSAGE);
         }
         if (department == null || department.trim().isEmpty()) {
-            throw new InvalidEmployeeException("Employee department cannot be empty");
+            throw new InvalidEmployeeException(EmployeeValidationRules.DEPARTMENT_REQUIRED_MESSAGE);
         }
-        if (department.trim().length() > MAX_DEPARTMENT_LENGTH) {
-            throw new InvalidEmployeeException(
-                    "Employee department name must not exceed " + MAX_DEPARTMENT_LENGTH + " characters"
-            );
+        if (department.trim().length() > EmployeeValidationRules.MAX_DEPARTMENT_LENGTH) {
+            throw new InvalidEmployeeException(EmployeeValidationRules.DEPARTMENT_LENGTH_MESSAGE);
         }
     }
 
