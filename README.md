@@ -11,39 +11,7 @@ Internal engineering entrypoint for the Employees API repository.
 
 ## Architecture Snapshot
 
-```mermaid
-flowchart LR
-	engineer[Engineer Browser]
-
-	subgraph Docs[Internal Docs]
-		docs[Docsify Portal<br/>nginx container<br/>localhost:3200]
-	end
-
-	subgraph Platform[Development Platform]
-		api[Spring Boot API<br/>localhost:8080/api]
-		db[(PostgreSQL)]
-		prom[Prometheus]
-		grafana[Grafana]
-		jaeger[Jaeger]
-	end
-
-	subgraph Core[Application Core]
-		infra[Infrastructure<br/>REST, JPA, filters]
-		app[Application<br/>use cases]
-		domain[Domain<br/>employees, rules, ports]
-	end
-
-	engineer --> docs
-	engineer --> api
-	engineer --> grafana
-	engineer --> jaeger
-	api --> infra --> app --> domain
-	infra --> db
-	api --> prom
-	prom --> grafana
-	api --> jaeger
-	docs -. links to .-> api
-```
+![Architecture snapshot](docs/assets/readme-architecture-snapshot.svg)
 
 ## Start Here
 
@@ -69,6 +37,7 @@ Then open:
 - Architecture: [docs/architecture/overview.md](docs/architecture/overview.md)
 - Docker workflow: [docs/operations/docker.md](docs/operations/docker.md)
 - Production setup: [docs/operations/production-setup.md](docs/operations/production-setup.md)
+- AI usage note: [docs/AI_USAGE.md](docs/AI_USAGE.md)
 - k6 stress testing: [docs/testing/k6.md](docs/testing/k6.md)
 - Docs portal maintenance: [docs/contributing/docs-portal.md](docs/contributing/docs-portal.md)
 
@@ -93,8 +62,3 @@ docker compose up -d docs
 ```bash
 ./gradlew test
 ```
-
-## Notes
-
-- Root-level Markdown files such as `ARCHITECTURE.md` and `DOCKER.md` are compatibility entrypoints.
-- Canonical engineering documentation should be added under `docs/`.

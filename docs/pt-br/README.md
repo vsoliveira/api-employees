@@ -49,6 +49,7 @@ Depois da inicialização, os principais pontos de entrada são:
 | Arquitetura | [Visão Geral da Arquitetura](/pt-br/architecture/overview.md) | Limites do sistema, camadas e modelo de implantação |
 | Operações | [Fluxo de Docker](/pt-br/operations/docker.md) | Inicialização, verificação e limpeza do dia a dia |
 | Operações | [Setup de Produção](/pt-br/operations/production-setup.md) | Modelo de ambientes e resumo de hardening |
+| Contribuição | [Uso de IA](/pt-br/AI_USAGE.md) | Como a IA apoia o fluxo de desenvolvimento e documentação |
 | Testes | [Testes de Estresse com k6](/pt-br/testing/k6.md) | Perfil de carga e caminho de exportação para o Prometheus |
 | Contribuição | [Manutenção do Portal de Docs](/pt-br/contributing/docs-portal.md) | Como atualizar o conteúdo e a navegação |
 

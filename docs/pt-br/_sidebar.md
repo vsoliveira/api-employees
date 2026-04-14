@@ -12,4 +12,5 @@
   - [Testes de Estresse com k6](/pt-br/testing/k6.md)
 
 - Contribuição
+  - [Uso de IA](/pt-br/AI_USAGE.md)
   - [Manutenção do Portal de Docs](/pt-br/contributing/docs-portal.md)
