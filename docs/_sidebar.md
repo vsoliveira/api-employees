@@ -12,4 +12,5 @@
   - [k6 Stress Testing](/testing/k6.md)
 
 - Contributing
+  - [AI Usage](/AI_USAGE.md)
   - [Maintaining the Docs Portal](/contributing/docs-portal.md)

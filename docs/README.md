@@ -49,6 +49,7 @@ After startup, the main internal entry points are:
 | Architecture | [Architecture Overview](/architecture/overview.md) | System boundaries, layers, and deployment model |
 | Operations | [Docker Workflow](/operations/docker.md) | Day-to-day startup, verification, and cleanup |
 | Operations | [Production Setup](/operations/production-setup.md) | Environment model and hardening summary |
+| Contributing | [AI Usage](/AI_USAGE.md) | How AI is used during development and documentation work |
 | Testing | [k6 Stress Testing](/testing/k6.md) | Load profile and Prometheus export path |
 | Contributing | [Maintaining the Docs Portal](/contributing/docs-portal.md) | How to update Docsify content and navigation |
 

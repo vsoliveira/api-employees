@@ -7,6 +7,15 @@
 ## Lesson Log
 
 - date: 2026-04-14
+  error_type: docs-rendering
+  trigger: "GitHub failed to render the README Mermaid architecture chart and showed 'Unable to render rich display'"
+  root_cause: "The Mermaid node labels used HTML line breaks, which are not reliably supported by GitHub's Mermaid renderer"
+  fix: "Replaced HTML-rich node labels with plain text labels in the README flowchart"
+  rule: "When Mermaid diagrams must render on GitHub, avoid HTML in node labels and prefer plain text labels"
+  occurrences: 1
+  status: active
+
+- date: 2026-04-14
   error_type: configuration-bug
   trigger: "Prometheus and OpenAPI consumers received 401 responses from agent-facing endpoints"
   root_cause: "ApiKeyFilter exclusions were hard-coded to outdated paths and did not match the configured Springdoc or Actuator URLs"
@@ -86,7 +95,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total lessons logged | 7 |
+| Total lessons logged | 8 |
 | Patterns amended to skills | 0 |
 | Recurring patterns (3+) | 0 |
 | Sessions since last new lesson | 0 |
