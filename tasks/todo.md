@@ -229,3 +229,20 @@ DELETE /api/v1/employees/{id}        Delete employee by UUID
 - [x] Validation-specific controller tests pass independently from the broader controller suite.
 - [x] The exception-layer decision is documented in the final assessment.
 
+## Task: Implement GitHub-only CI quality gates
+
+### Context
+- What: Add a GitHub Actions CI workflow and Gradle quality gates for coverage, security, maintainability, and bug detection.
+- Why: The repository currently has only a plan-enforcement workflow and no automated code-quality guardrails for pull requests.
+- Risk: Static-analysis defaults can create noisy failures unless the build is configured with focused rules and executable verification scripts.
+
+### Steps
+- [x] Add Gradle quality plugins and configure the baseline 95% total coverage gate.
+- [x] Add repository verification scripts, including a changed-line coverage check enforcing 98% on PR code.
+- [x] Add GitHub Actions workflow(s) to run dependency review and the quality gates on pull requests and `main`.
+
+### Verification
+- [x] `./scripts/verify.sh` runs locally and fails the build on coverage or static-analysis violations.
+- [x] The PR workflow enforces dependency review and 98% changed-line coverage.
+- [x] Generated reports are published as CI artifacts for triage.
+

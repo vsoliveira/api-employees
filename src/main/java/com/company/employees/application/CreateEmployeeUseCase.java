@@ -5,6 +5,8 @@ import com.company.employees.domain.EmployeeAlreadyExistsException;
 import com.company.employees.domain.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.Locale;
+
 /**
  * Use Case: Create Employee
  * Receives a request to create a new employee.
@@ -19,7 +21,7 @@ public class CreateEmployeeUseCase {
 
     public EmployeeResponse execute(CreateEmployeeRequest request) {
         // Check if email already exists
-        if (employeeRepository.findByEmail(request.getEmail().trim().toLowerCase()).isPresent()) {
+        if (employeeRepository.findByEmail(request.getEmail().trim().toLowerCase(Locale.ROOT)).isPresent()) {
             throw new EmployeeAlreadyExistsException(request.getEmail());
         }
 

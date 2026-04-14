@@ -2,7 +2,7 @@
 
 ## Code Standards
 
-- Use Java 25
+- Use Java 21
 - Use Domain-Driven Design principles
 - Use Hexagonal Architecture principles
 - Use SOLID principles
