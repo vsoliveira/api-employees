@@ -113,6 +113,57 @@ The dashboard shows:
 - HTTP Requests Count
 - System metrics
 
+### View k6 Stress Runs in Grafana
+
+1. Start a tagged k6 run that exports metrics to Prometheus:
+
+```bash
+./scripts/run-k6-prometheus.sh employees-dashboard-smoke
+```
+
+You can override the main k6 workload values inline before the command:
+
+| Value | What It Is | Sample Value | Override Example |
+|-------|------------|--------------|------------------|
+| `BROWSE_RATE` | Target read request rate per second for paginated employee listing. | `8` | `BROWSE_RATE=8 ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `BROWSE_PRE_ALLOCATED_VUS` | Initial VUs reserved for the browse scenario before k6 scales further. | `3` | `BROWSE_PRE_ALLOCATED_VUS=3 ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `BROWSE_MAX_VUS` | Hard cap for browse-scenario VUs when the arrival rate increases. | `10` | `BROWSE_MAX_VUS=10 ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `BROWSE_STAGE_ONE_DURATION` | Ramp-up duration for the first browse stage. | `5s` | `BROWSE_STAGE_ONE_DURATION=5s ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `BROWSE_STAGE_TWO_DURATION` | Steady-state duration for the main browse load stage. | `10s` | `BROWSE_STAGE_TWO_DURATION=10s ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `BROWSE_STAGE_THREE_DURATION` | Ramp-down duration for the final browse stage. | `5s` | `BROWSE_STAGE_THREE_DURATION=5s ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `WRITE_VUS` | Concurrent virtual users for create/delete churn. | `1` | `WRITE_VUS=1 ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `WRITE_DURATION` | Total duration of the create/delete scenario. | `10s` | `WRITE_DURATION=10s ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `WRITE_GRACEFUL_STOP` | Extra shutdown window for in-flight write iterations to finish cleanly. | `5s` | `WRITE_GRACEFUL_STOP=5s ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `PAGE_SIZE` | Employee page size used by the browse scenario. | `100` | `PAGE_SIZE=100 ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `BASE_URL` | Base API URL used by k6. | `http://localhost:8080/api` | `BASE_URL=http://localhost:8080/api ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+| `API_KEY` | API key sent in the `X-API-Key` header for protected endpoints. | `dev-api-key` | `API_KEY=dev-api-key ./scripts/run-k6-prometheus.sh employees-dashboard-smoke` |
+
+Example with several overrides at once:
+
+```bash
+BROWSE_RATE=12 \
+BROWSE_PRE_ALLOCATED_VUS=4 \
+BROWSE_MAX_VUS=12 \
+WRITE_VUS=2 \
+WRITE_DURATION=20s \
+./scripts/run-k6-prometheus.sh employees-dashboard-tuned
+```
+
+2. Open http://localhost:3000
+3. Login with `admin/admin`
+4. Go to **Dashboards** → **k6 Stress Overview**
+5. In the `testid` filter, select the run id you used, for example `employees-dashboard-smoke`
+6. Optionally narrow the `scenario` filter to `browseEmployees` or `createAndDeleteEmployees`
+
+The k6 dashboard shows:
+- Active virtual users and configured max VUs
+- HTTP request rate and iteration rate
+- Error rate
+- Average, p95, p99, and max request latency
+- Throughput split by scenario and HTTP status
+
+If the run does not appear immediately, wait a few seconds and refresh the dashboard. The wrapper sends metrics to Prometheus using remote write and tags every series with the selected `testid`.
+
 ### View Traces in Jaeger
 
 1. Open http://localhost:16686
@@ -267,8 +318,10 @@ Flyway automatically:
 
 ### Creating New Migrations
 
-1. Create a new file: `src/main/resources/db/migration/V<number>__<description>.sql`
-   - Example: `V2__Add_employee_salary.sql`
+1. Create a new file with the timestamp-based naming pattern: `src/main/resources/db/migration/YYYYMMDD_HHMMSS__description.sql`
+   - Example: `20260414_143000__add_employee_salary.sql`
+   - The date and time stay in ascending order, so file names read from oldest to newest.
+   - Use `./scripts/create-migration.sh "add employee salary"` to generate the file name automatically.
 
 2. Write SQL:
 ```sql
@@ -276,6 +329,7 @@ ALTER TABLE employees ADD COLUMN salary DECIMAL(10, 2);
 ```
 
 3. Migrations run automatically on application startup
+4. If you already ran older `V...` migrations locally, reset the local database volume before starting the app on this branch so Flyway can rebuild its schema history with the new names.
 
 ## Unit Testing
 

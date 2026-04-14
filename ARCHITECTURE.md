@@ -183,10 +183,11 @@ All non-test environments use PostgreSQL 15+:
 ### Migration Strategy (Flyway)
 
 - **Location**: `src/main/resources/db/migration/`
-- **Naming**: `V<version>__<description>.sql`
-- **Example**: `V1__Create_Employees_Table.sql`
+- **Naming**: `YYYYMMDD_HHMMSS__description.sql`
+- **Example**: `20260414_143000__create_employees_table.sql`
 - **Execution**: Automatic on application startup
 - **Validation**: Checksums prevent accidental modifications
+- **Ordering**: Timestamp prefixes sort chronologically from oldest migration to newest migration
 - **Baseline**: Enabled for existing schemas
 
 ### H2 for Testing Only

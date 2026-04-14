@@ -246,3 +246,71 @@ DELETE /api/v1/employees/{id}        Delete employee by UUID
 - [x] The PR workflow enforces dependency review and 98% changed-line coverage.
 - [x] Generated reports are published as CI artifacts for triage.
 
+## Task: Standardize Flyway migration naming
+
+### Context
+- What: Move Flyway SQL migrations to a timestamp-first naming convention.
+- Why: Migration files should sort chronologically by filename and remain human-readable without relying on `V<number>` sequencing.
+- Risk: Renaming the existing baseline migration changes Flyway history expectations for any already-initialized local databases.
+
+### Steps
+- [x] Configure Flyway to read timestamp-based versioned migrations.
+- [x] Rename the existing SQL migration to the new timestamp-based format.
+- [x] Add tooling and documentation so new migrations follow the same convention consistently.
+
+### Verification
+- [ ] The migration directory passes the naming validation in `./scripts/verify.sh`.
+- [ ] The application can still start Flyway successfully against a clean database with the renamed migration set.
+- [ ] The diff documents the required local database reset for developers with existing Flyway history.
+
+## Task: Seed more than 100000 employees
+
+### Context
+- What: Add a Flyway migration that inserts a large employee dataset for development and load testing.
+- Why: The database needs a realistic high-volume baseline without relying on manual scripts after startup.
+- Risk: Bulk inserts can be slow or generate invalid UUID/email values if the SQL is not deterministic.
+
+### Steps
+- [x] Add a timestamped Flyway migration that inserts more than 100000 employees.
+- [x] Keep the seeded departments capped at 50 distinct values.
+- [x] Validate the migration naming and SQL against the dev PostgreSQL instance.
+
+### Verification
+- [x] The new migration filename matches the repository timestamp convention.
+- [x] The SQL executes successfully on PostgreSQL.
+- [x] The seed data creates more than 100000 employees while using no more than 50 departments.
+
+## Task: Humanize seeded employees and add k6 coverage
+
+### Context
+- What: Make the large employee seed dataset look more realistic and add a k6 scenario that exercises the employee API against that dataset.
+- Why: More human-readable names and department labels improve demos and manual verification, while k6 coverage gives the seeded dataset an immediate load-testing use case.
+- Risk: Follow-up data migrations must stay deterministic, and the k6 script has to match the authenticated API contract and context path exactly.
+
+### Steps
+- [x] Add a follow-up Flyway migration that rewrites seeded names and department labels into realistic values.
+- [x] Add a k6 script that mixes paginated reads with create/delete churn against `/api/v1/employees`.
+- [x] Validate the new migration and smoke-test the k6 script against the dev stack.
+
+### Verification
+- [x] The live seed data uses realistic names and still caps departments at 50 distinct values.
+- [x] The new Flyway migration applies cleanly on PostgreSQL.
+- [x] The k6 script runs successfully against the dev stack with the configured API key.
+
+## Task: Wire k6 remote write for Grafana
+
+### Context
+- What: Add a repeatable way to run the employee k6 script with Prometheus remote write enabled.
+- Why: The Grafana k6 dashboard only populates when k6 exports metrics to Prometheus with a unique `testid` tag.
+- Risk: If the wrapper and docs drift from the actual dev stack ports or auth defaults, stress runs will succeed locally but not appear in Grafana.
+
+### Steps
+- [x] Add a wrapper script that runs the employee k6 scenario with Prometheus remote write and a `testid` tag.
+- [x] Document what the remote-write environment variables do and how to use the wrapper.
+- [x] Execute one tagged run and verify Prometheus received the k6 metrics.
+
+### Verification
+- [x] The wrapper runs the employee stress script with `-o experimental-prometheus-rw` and a unique `testid`.
+- [x] Prometheus exposes k6 metrics for the tagged run.
+- [x] Grafana can filter the run by `testid` on the k6 dashboard.
+
