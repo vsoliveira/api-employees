@@ -6,6 +6,15 @@
 
 ## Lesson Log
 
+- date: 2026-04-14
+  error_type: configuration-bug
+  trigger: "Prometheus and OpenAPI consumers received 401 responses from agent-facing endpoints"
+  root_cause: "ApiKeyFilter exclusions were hard-coded to outdated paths and did not match the configured Springdoc or Actuator URLs"
+  fix: "Switched to resilient path-pattern exclusions and added regression tests for docs and actuator endpoints"
+  rule: "When auth filters exempt framework endpoints, match the effective configured paths and cover them with tests"
+  occurrences: 1
+  status: active
+
 <!-- Use the YAML format below for each entry. Tags enable querying and pattern detection. -->
 
 <!--
@@ -23,7 +32,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total lessons logged | 0 |
+| Total lessons logged | 1 |
 | Patterns amended to skills | 0 |
 | Recurring patterns (3+) | 0 |
 | Sessions since last new lesson | 0 |

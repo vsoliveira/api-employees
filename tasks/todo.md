@@ -93,3 +93,20 @@ DELETE /api/v1/employees/{id}        Delete employee by UUID
 - PostgreSQL is the runtime database for local, dev, stage, and prod profiles.
 - Observability is configured at the runtime and container level, but still needs end-to-end verification in a running environment.
 
+## Task: Expose Agent-Facing Endpoints Without API Key
+
+### Context
+- What: Remove API key enforcement from documentation and observability endpoints consumed by sidecar agents.
+- Why: Prometheus, Swagger/OpenAPI consumers, and other endpoint-driven agents are being blocked by the API key filter.
+- Risk: Over-broad exclusions could weaken protection on employee business endpoints.
+
+### Steps
+- [x] Align API key exclusions with the actual Springdoc and Actuator endpoint paths.
+- [x] Add regression tests covering public docs and observability endpoints.
+- [x] Run verification for the affected test suite and inspect the diff.
+
+### Verification
+- [x] Swagger/OpenAPI endpoints do not return 401 without an API key.
+- [x] Actuator endpoints used by sidecars do not return 401 without an API key.
+- [x] Employee business endpoints still require a valid API key.
+

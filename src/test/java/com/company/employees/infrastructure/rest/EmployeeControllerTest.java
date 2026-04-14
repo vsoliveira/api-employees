@@ -9,11 +9,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.ResultMatcher;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@SuppressWarnings("null")
 @DisplayName("Employee REST API Integration Tests")
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -107,6 +109,24 @@ class EmployeeControllerTest {
         // With valid API key → NOT 401 (passes auth layer)
         mockMvc.perform(delete("/api/v1/employees/" + employeeId)
                 .header(API_KEY_HEADER, API_KEY))
+                .andExpect(isNotUnauthorized());
+    }
+
+    @Test
+    @DisplayName("Agent-facing endpoints bypass API key authentication")
+    void testAgentFacingEndpointsBypassApiKey() throws Exception {
+        assertEndpointBypassesApiKey(get("/api/swagger-ui.html"));
+        assertEndpointBypassesApiKey(get("/api/v1/api-docs"));
+        assertEndpointBypassesApiKey(get("/api/actuator/health"));
+        assertEndpointBypassesApiKey(get("/api/actuator/metrics"));
+        assertEndpointBypassesApiKey(get("/api/actuator/prometheus"));
+    }
+
+    private void assertEndpointBypassesApiKey(MockHttpServletRequestBuilder requestBuilder) throws Exception {
+        mockMvc.perform(requestBuilder)
+                .andExpect(isNotUnauthorized());
+
+        mockMvc.perform(requestBuilder.header(API_KEY_HEADER, "wrong-key"))
                 .andExpect(isNotUnauthorized());
     }
 }
