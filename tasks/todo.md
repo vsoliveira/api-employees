@@ -331,3 +331,37 @@ DELETE /api/v1/employees/{id}        Delete employee by UUID
 - [x] `docker build -f Dockerfile .` can package the application from source without a prebuilt local JAR.
 - [x] Docker docs no longer require `./gradlew bootJar` before starting Compose.
 
+## Task: Add internal Docsify documentation portal
+
+### Context
+- What: Add a branded Docsify site that organizes the repository Markdown documentation and runs as a separate container.
+- Why: The current Markdown files are useful but scattered, which makes internal engineering documentation harder to browse, search, and present.
+- Risk: Moving docs into a dedicated tree can break existing links or leave Docker workflows unclear if the docs container is not wired consistently.
+
+### Steps
+- [x] Create a dedicated docs source tree, migrate the existing Markdown content into organized sections, and keep root-level compatibility stubs where needed.
+- [x] Add a Docsify site shell with landing page, sidebar, navbar, search, and internal branding assets.
+- [x] Add a separate Docsify container and document how to run it from the repository Docker workflows.
+
+### Verification
+- [x] The Docsify site serves the reorganized internal docs with working navigation and search.
+- [x] The docs container starts successfully from Docker Compose.
+- [x] Repository docs explain how engineers should access and maintain the portal.
+
+## Task: Add Docsify multilingual navigation and fix nested route loading
+
+### Context
+- What: Add Docsify language switching with `en-US` as the default locale and `pt-BR` as an alternative, while fixing the shared sidebar/navbar loading issue on nested routes.
+- Why: Internal engineers need bilingual documentation, and the current Docsify route handling leaves the sidebar stuck in `Loading...` when navbar links open nested pages.
+- Risk: Route rewrites and localized file trees can drift if shared navigation aliases and locale path mappings are not kept consistent.
+
+### Steps
+- [x] Fix Docsify shared file loading for nested routes and add locale-aware route handling in the portal runtime.
+- [x] Add a visible language selector that switches between `en-US` and `pt-BR` and preserves the current document path.
+- [x] Add localized `pt-BR` docs pages and update maintenance guidance for the bilingual docs structure.
+
+### Verification
+- [x] Navbar navigation loads nested pages without leaving the sidebar in `Loading...`.
+- [x] The language switcher moves between `en-US` and `pt-BR` while preserving the current page when translations exist.
+- [x] The Docsify container still builds and serves the bilingual docs portal successfully.
+

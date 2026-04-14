@@ -51,6 +51,24 @@
   occurrences: 1
   status: active
 
+- date: 2026-04-14
+  error_type: compose-coupling
+  trigger: "The Docsify portal smoke test could not start because the docs service depended on the API health check"
+  root_cause: "A static documentation container was modeled as if it required the application runtime, even though it only serves local files"
+  fix: "Removed the `depends_on` relationship so the docs service can start independently"
+  rule: "Do not gate static internal tooling containers on application-health dependencies unless they actually proxy or consume the app at startup"
+  occurrences: 1
+  status: active
+
+- date: 2026-04-14
+  error_type: docsify-routing
+  trigger: "Clicking a navbar link opened the page but left the sidebar stuck in `Loading...`"
+  root_cause: "Docsify was resolving `_sidebar.md` and `_navbar.md` relative to nested routes without aliases for shared navigation files"
+  fix: "Added locale-aware Docsify aliases so nested routes always load the correct shared sidebar and navbar files"
+  rule: "When Docsify uses shared navigation files across nested routes, declare explicit aliases for `_sidebar.md`, `_navbar.md`, and related shared assets"
+  occurrences: 1
+  status: active
+
 <!-- Use the YAML format below for each entry. Tags enable querying and pattern detection. -->
 
 <!--
@@ -68,7 +86,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total lessons logged | 5 |
+| Total lessons logged | 7 |
 | Patterns amended to skills | 0 |
 | Recurring patterns (3+) | 0 |
 | Sessions since last new lesson | 0 |

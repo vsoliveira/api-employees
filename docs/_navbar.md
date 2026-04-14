@@ -1,0 +1,7 @@
+- [Home](/README.md)
+- [Architecture](/architecture/overview.md)
+- [Docker](/operations/docker.md)
+- [Production](/operations/production-setup.md)
+- [k6](/testing/k6.md)
+- [Swagger UI](http://localhost:8080/api/swagger-ui.html)
+- [OpenAPI](http://localhost:8080/api/v1/api-docs)
