@@ -17,6 +17,9 @@ spring:
   flyway:
     locations: classpath:db/migration
     baselineOnMigrate: true
+    sql-migration-prefix: ""
+    sql-migration-separator: "__"
+    validate-migration-naming: true
 
 server:
   port: 8080
