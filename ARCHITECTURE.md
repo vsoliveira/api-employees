@@ -360,13 +360,11 @@ Internet
    ↓
 2. ./gradlew test (H2 tests)
    ↓
-3. ./gradlew bootJar (build container image)
+3. cd docker/dev && docker compose up --build (build app image and start stack)
    ↓
-4. cd docker/dev && docker-compose up (verify)
+4. Integration testing (real PostgreSQL + sidecars)
    ↓
-5. Integration testing (real PostgreSQL)
-   ↓
-6. Commit & Push
+5. Commit & Push
 ```
 
 ### Stage Deployment
@@ -380,7 +378,7 @@ Internet
    ↓
 4. Push to registry (docker.company.com)
    ↓
-5. Deploy: docker-compose -f docker/stage/docker-compose.yml up
+5. Deploy: docker compose -f docker/stage/docker-compose.yml up --build
    ↓
 6. Smoke tests
    ↓
@@ -393,8 +391,8 @@ Internet
 1. Approve stage changes
    ↓
 2. Deploy with secrets management:
-   docker-compose -f docker/prod/docker-compose.yml \
-     --env-file /etc/employees-api/.env.prod up
+   docker compose -f docker/prod/docker-compose.yml \
+     --env-file /etc/employees-api/.env.prod up --build
    ↓
 3. Blue-green deployment:
    - Start new version (blue)
@@ -425,7 +423,7 @@ Internet
 
 **Horizontal Scaling** (add instances):
 ```bash
-docker-compose up --scale app=3
+docker compose up --scale app=3
 ```
 
 **Load Balancing** Options:
@@ -484,7 +482,7 @@ DATABASE_PASSWORD=somehardcodedpass
 
 # Do this instead:
 export DATABASE_PASSWORD=$(aws secretsmanager get-secret-value --secret-id employees-api-db-password)
-docker-compose up
+docker compose up
 ```
 
 ## Monitoring & Alerting
@@ -555,7 +553,7 @@ docker run --rm \
 **Container/Image Recovery**:
 1. Pull previous image from registry
 2. Update docker-compose.yml
-3. `docker-compose up` (redeploy)
+3. `docker compose up --build` (redeploy)
 
 ## Documentation Standards
 
