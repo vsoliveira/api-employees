@@ -39,10 +39,10 @@ management:
       prometheus:
         enabled: true
   tracing:
-    jaeger:
-      grpc:
-        endpoint: ${JAEGER_GRPC_ENDPOINT:http://localhost:14250}
-      enabled: true
+    enabled: true
+  otlp:
+    tracing:
+      endpoint: ${OTEL_TRACING_ENDPOINT:http://localhost:4318/v1/traces}
 
 springdoc:
   api-docs:

@@ -39,14 +39,19 @@ management:
     health:
       show-details: always
   metrics:
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+      percentiles:
+        http.server.requests: 0.5, 0.95, 0.99
     export:
       prometheus:
         enabled: true
   tracing:
-    jaeger:
-      grpc:
-        endpoint: http://jaeger:14250
-      enabled: true
+    enabled: true
+  otlp:
+    tracing:
+      endpoint: ${OTEL_TRACING_ENDPOINT:http://jaeger:4318/v1/traces}
 
 springdoc:
   api-docs:
