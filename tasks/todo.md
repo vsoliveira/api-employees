@@ -86,6 +86,25 @@ DELETE /api/v1/employees/{id}        Delete employee by UUID
 - [ ] Review production environment defaults and replace placeholder secrets
 - [ ] Perform final code review before merge
 
+## Task: Reorganize packages for modular HR growth
+
+### Context
+- What: Restructure the codebase from an employee-centric root package into a neutral HR root with an isolated employees module and a small shared kernel.
+- Why: The service is expected to grow into a broader HR domain, and the code should stay maintainable now while remaining extractable later.
+- Risk: Broad package moves can break Spring component scanning, imports, tests, and build configuration if not updated consistently.
+
+### Steps
+- [x] Move the application entry point to a neutral root package and relocate employee code under an employees module.
+- [x] Extract only truly generic primitives into a shared package and keep employee-specific rules inside the employees module.
+- [x] Update the test packages and support fixtures to mirror the new module structure.
+- [x] Add ArchUnit tests that lock the layering rules and prevent module-boundary erosion.
+- [x] Run targeted verification and review the refactor diff for accidental coupling.
+
+### Verification
+- [x] Main and test sources compile under the new package structure.
+- [x] Existing employee tests pass after the package move.
+- [x] ArchUnit rules fail on invalid dependencies and pass on the intended structure.
+
 ## Notes
 
 - The codebase currently targets Java 21 in the Gradle build.

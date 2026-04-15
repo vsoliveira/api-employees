@@ -73,6 +73,7 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.platform:junit-platform-launcher'
     testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'
 
     spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.13.0'
 }
@@ -128,5 +129,5 @@ tasks.named('check') {
 }
 
 bootJar {
-    mainClass = 'com.company.employees.EmployeesApplication'
+    mainClass = 'com.company.hr.HrApplication'
 }
