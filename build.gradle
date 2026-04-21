@@ -47,7 +47,7 @@ dependencies {
 
     // Database
     implementation 'org.postgresql:postgresql:42.7.1'
-    implementation 'com.h2database:h2:2.2.224'
+    implementation 'com.h2database:h2:2.4.240'
     implementation 'org.flywaydb:flyway-core'
     implementation 'org.flywaydb:flyway-database-postgresql'
 
@@ -72,7 +72,7 @@ dependencies {
     // Testing
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.junit.platform:junit-platform-launcher'
-    testImplementation 'com.h2database:h2:2.2.224'
+    testImplementation 'com.h2database:h2:2.4.240'
     testImplementation 'com.tngtech.archunit:archunit-junit5:1.4.1'
 
     spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.13.0'
